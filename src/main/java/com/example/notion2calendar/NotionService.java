@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -158,6 +159,11 @@ public class NotionService {
                 System.out.println("title 배열이 비어 있습니다.");
             }
 
+            // 알림 해제
+            Event.Reminders reminders = new Event.Reminders()
+                    .setUseDefault(false) // 기본 알림 사용 안 함
+                    .setOverrides(Collections.emptyList()); // 알림 목록 비우기
+
             // 태그 추출
             Map<String, Object> tagProperty = (Map<String, Object>) properties.get("태그");
             List<Map<String, Object>> multiSelectList = (List<Map<String, Object>>) tagProperty.get("multi_select");
@@ -165,12 +171,17 @@ public class NotionService {
             if (!multiSelectList.isEmpty()) {
                 tagName = (String) multiSelectList.get(0).get("name");
                 memo += tagName + ", ";
+
+                // 태그에 따라 색상 설정
                 if (tagName.equals("공고")) { color = 8; }
                 else if (tagName.equals("일정")) { color = 2; }
                 else if (tagName.equals("Task")) { color = 1; }
                 else if (tagName.equals("chore")) { color = 5; }
                 else if (tagName.equals("약속")) { color = 4; }
                 // 1 = 연보라, 2 = 세이지, 3 = 보라, 4 = 홍학, 5 = 호박색?, 6 = 주황, 7 = 하늘, 8 = 흑연, 9 = 파랑, 10 = 초록, 11 = 빨강
+
+                // 일정의 경우 알림 설정
+                if (tagName.equals("일정")) { reminders = new Event.Reminders().setUseDefault(true); }
 
                 System.out.println("추출된 태그 이름: " + tagName);
             } else {
@@ -192,6 +203,8 @@ public class NotionService {
             } else {
                 System.out.println("메모가 없습니다.");
             }
+
+
 
 
             if (tagName.equals("공고")) {
@@ -272,6 +285,7 @@ public class NotionService {
                 existingEvent.setSummary(title) // 제목 업데이트
                         .setDescription(memo) // 설명 업데이트
                         .setColorId(color + "")
+                        .setReminders(reminders)
                         .setStart(new EventDateTime().setDateTime(startDateTime)) // 시작 시간 업데이트
                         .setEnd(new EventDateTime().setDateTime(endDateTime)); // 종료 시간 업데이트
 
@@ -284,6 +298,7 @@ public class NotionService {
                         .setSummary(title) // 제목 설정
                         .setDescription(memo) // 설명 설정
                         .setColorId(color + "")
+                        .setReminders(reminders)
                         .setStart(new EventDateTime().setDateTime(startDateTime)) // 시작 시간 설정
                         .setEnd(new EventDateTime().setDateTime(endDateTime)); // 종료 시간 설정
 
