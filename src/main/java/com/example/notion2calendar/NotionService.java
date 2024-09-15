@@ -140,6 +140,8 @@ public class NotionService {
             String endTime = dateDetails.get("end");
 
             String memo = "";
+            int color = 9;
+            // 1 = 연보라, 2 = 세이지, 3 = 보라, 4 = 홍학, 5 = 호박색?, 6 = 빨강, 7 = 하늘, 8 = 흑연, 9 = 파랑, 10 = 초록
 
             // 시작 시간과 종료 시간을 DateTime 객체로 변환
             DateTime startDateTime;
@@ -163,6 +165,13 @@ public class NotionService {
             if (!multiSelectList.isEmpty()) {
                 tagName = (String) multiSelectList.get(0).get("name");
                 memo += tagName + ", ";
+                if (tagName.equals("공고")) { color = 8; }
+                else if (tagName.equals("일정")) { color = 2; }
+                else if (tagName.equals("Task")) { color = 1; }
+                else if (tagName.equals("chore")) { color = 5; }
+                else if (tagName.equals("약속")) { color = 4; }
+                // 1 = 연보라, 2 = 세이지, 3 = 보라, 4 = 홍학, 5 = 호박색?, 6 = 주황, 7 = 하늘, 8 = 흑연, 9 = 파랑, 10 = 초록, 11 = 빨강
+
                 System.out.println("추출된 태그 이름: " + tagName);
             } else {
                 System.out.println("multi_select 배열이 비어 있습니다.");
@@ -262,6 +271,7 @@ public class NotionService {
                 // 업데이트할 내용 설정
                 existingEvent.setSummary(title) // 제목 업데이트
                         .setDescription(memo) // 설명 업데이트
+                        .setColorId(color + "")
                         .setStart(new EventDateTime().setDateTime(startDateTime)) // 시작 시간 업데이트
                         .setEnd(new EventDateTime().setDateTime(endDateTime)); // 종료 시간 업데이트
 
@@ -273,6 +283,7 @@ public class NotionService {
                 Event googleEvent = new Event()
                         .setSummary(title) // 제목 설정
                         .setDescription(memo) // 설명 설정
+                        .setColorId(color + "")
                         .setStart(new EventDateTime().setDateTime(startDateTime)) // 시작 시간 설정
                         .setEnd(new EventDateTime().setDateTime(endDateTime)); // 종료 시간 설정
 
